@@ -32,8 +32,6 @@ public class HomePage {
     public WebElement page2Btn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/doneBtn")
     public WebElement doneBtn;
-    @AndroidFindBy(xpath = "//android.widget.Toast[@text=\"Please fill all required fields\"]")
-    public WebElement modifiersToastMessage;
     @AndroidFindBy(id = "com.figment.pos.dev:id/homeLayout")
     public WebElement sideMenuHomePage;
     @AndroidFindBy(id = "com.figment.pos.dev:id/managerDashboardLayout")
@@ -56,6 +54,16 @@ public class HomePage {
     public WebElement parkNoteTxt;
     @AndroidFindBy(id = "com.figment.pos.dev:id/sendBtn")
     public WebElement parkNoteBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/splitByValueBtn")
+    public WebElement splitByValueBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/addPayment")
+    public WebElement addPaymentBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/charge")
+    public WebElement chargeBtn;
+    @AndroidFindBy(xpath = "(//android.widget.Button[@resource-id=\"com.figment.pos.dev:id/charge\"])[2]")
+    public WebElement newChargeBtn;
+    @AndroidFindBy(xpath = "(//android.view.ViewGroup[@resource-id=\"com.figment.pos.dev:id/container\"])[2]")
+    public WebElement creditPaymentSplit;
 
     public int min;
     public int max;
@@ -182,6 +190,7 @@ public class HomePage {
         after = getCartItemsCount();
         Assert.assertTrue(before<=after);
         clickAnyOfOrderOptions();
+        waitForVisibility(sideMenuDailySales);
         sideMenuDailySales.click();
         waitForVisibility(dailySalesMainBanner);
         sideMenuHomePage.click();
@@ -220,5 +229,26 @@ public class HomePage {
         voidBtn.click();
         waitForVisibility(confirmVoidBtn);
         confirmVoidBtn.click();
+    }
+
+    public void splitByValue() {
+        waitForVisibility(checkoutBtn);
+        checkoutBtn.click();
+        waitForVisibility(splitByValueBtn);
+        splitByValueBtn.click();
+        waitForVisibility(chargeBtn);
+        addPaymentBtn.click();
+        waitForVisibility(newChargeBtn);
+        newChargeBtn.click();
+        waitForVisibility(creditPaymentSplit);
+        creditPaymentSplit.click();
+        waitForVisibility(payBtn);
+        payBtn.click();
+        waitForVisibility(chargeBtn);
+        chargeBtn.click();
+        waitForVisibility(creditPaymentSplit);
+        creditPaymentSplit.click();
+        waitForVisibility(payBtn);
+        payBtn.click();
     }
 }
