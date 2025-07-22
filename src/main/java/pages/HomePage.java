@@ -40,16 +40,28 @@ public class HomePage {
     public WebElement sideMenuDailySales;
     @AndroidFindBy(id = "com.figment.pos.dev:id/tabsLayout")
     public WebElement dailySalesMainBanner;
-
+    @AndroidFindBy(id = "com.figment.pos.dev:id/proceed")
+    public WebElement checkoutBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/park")
+    public WebElement parkBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/decline")
+    public WebElement voidBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/okBtn")
+    public WebElement confirmVoidBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/payBtn")
+    public WebElement payBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/secondPaymentContainer")
+    public WebElement creditPaymentContainer;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/edittext")
+    public WebElement parkNoteTxt;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/sendBtn")
+    public WebElement parkNoteBtn;
 
     public int min;
     public int max;
     public int before;
     public int after;
 
-    /**
-     * get how many item in cart.
-     */
     public int getCartItemsCount() {
         String cartItem = "//androidx.recyclerview.widget.RecyclerView[@resource-id=\"com.figment.pos.dev:id/cartItems\"]/android.view.ViewGroup";
         List<WebElement> items = DriverManager.getDriver().findElements(By.xpath(cartItem));
@@ -82,87 +94,7 @@ public class HomePage {
         }
     }
 
-    /**
-     * Handles clicking one random variant and then the required 'min' modifiers.
-     * Variants are buttons above the Min/Max marker; modifiers are below.
-     */
-    /*public void handleVariantsAndModifiers() throws InterruptedException {
-        String itemXPath   = "//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/recyclerView']/android.view.ViewGroup";
-        String buttonXPath = "//android.view.ViewGroup[@resource-id='com.figment.pos.dev:id/constraintLayout']";
-
-        // 1. Find Min/Max marker position among items
-        List<WebElement> items = DriverManager.getDriver().findElements(By.xpath(itemXPath));
-        int markerItemIndex = -1;
-        if(items.size()>1){
-            for (int i = 0; i < items.size(); i++) {
-                WebElement item = items.get(i);
-                for (WebElement tv : item.findElements(By.className("android.widget.TextView"))) {
-                    String text = tv.getText();
-                    if (text.contains("Min:") && text.contains("Max:")) {
-                        Matcher m = Pattern.compile("Min:\\s*(\\d+)\\s*\\|\\s*Max:\\s*(\\d+)").matcher(text);
-                        if (m.find()) {
-                            min = Integer.parseInt(m.group(1));
-                            max = Integer.parseInt(m.group(2));
-                            markerItemIndex = i;
-//                        System.out.println("🔍 Marker at item index " + i + ", Min=" + min + ", Max=" + max);
-                            break;
-                        }
-                    }
-                }
-                if (markerItemIndex >= 0) break;
-            }
-
-            if (markerItemIndex < 0) {
-                System.out.println("❌ Could not find Min/Max marker.");
-                return;
-            }
-
-            // 2. Split buttons into variants and modifiers
-            List<WebElement> allButtons = DriverManager.getDriver().findElements(By.xpath(buttonXPath));
-            // assume one button per item
-            int variantCount = markerItemIndex;
-
-            // 3. Click a random variant (index 0..variantCount-1)
-            if (variantCount > 0) {
-                int randomIdx = getRandomIndex(variantCount);
-                allButtons.get(randomIdx).click();
-                Thread.sleep(300);
-            }
-
-            // 4. Click 'min' modifiers: buttons at indices variantCount .. variantCount+min-1
-            for (int offset = 0; offset <min; offset++) {
-                int globalIdx = variantCount + offset;
-                int tries = 0;
-                boolean clicked = false;
-                while (!clicked && tries < 6) {
-                    List<WebElement> buttons = DriverManager.getDriver().findElements(By.xpath(buttonXPath));
-                    if (buttons.size() > globalIdx) {
-                        try {
-                            buttons.get(globalIdx).click();
-                            Thread.sleep(300);
-                            clicked = true;
-
-                        } catch (StaleElementReferenceException stale) {
-                            System.out.println("🔄 Stale, retry modifier #" + (offset + 1));
-                        }
-                    } else {
-                        // not loaded yet → scroll and retry
-                        ScrollUtils.scrollDown(DriverManager.getDriver());
-                        Thread.sleep(300);
-                        tries++;
-                        System.out.println("🔃 Scrolling for modifier #" + (offset + 1));
-                    }
-                }
-                if (!clicked) {
-                    System.out.println("❌ Failed modifier #" + (offset + 1));
-                    break;
-                }
-            }
-            doneBtn.click();
-        }
-    }*/
-
-    /*new copiplet code section start*/
+    /*new copilot code section start*/
     public void handleVariantsAndModifiers() throws InterruptedException {
         String itemXPath   = "//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/recyclerView']/android.view.ViewGroup";
         String buttonXPath = "//android.view.ViewGroup[@resource-id='com.figment.pos.dev:id/constraintLayout']";
@@ -234,7 +166,7 @@ public class HomePage {
             System.out.println("No modifiers required for this product.");
         }
     }
-    /*new copiplet code section end*/
+    /*new copilot code section end*/
 
     /**
      * Entry point: select category and handle variants/modifiers.
@@ -263,5 +195,30 @@ public class HomePage {
         for (int i = 0; i < count; i++) {
             Select();
         }
+    }
+
+    public void checkoutOrder() {
+        waitForVisibility(checkoutBtn);
+        checkoutBtn.click();
+        waitForVisibility(creditPaymentContainer);
+        creditPaymentContainer.click();
+        waitForVisibility(payBtn);
+        payBtn.click();
+    }
+
+    public void parkOrder(String note) {
+        waitForVisibility(parkBtn);
+        parkBtn.click();
+        waitForVisibility(parkNoteTxt);
+        parkNoteTxt.sendKeys(note);
+        waitForVisibility(parkNoteBtn);
+        parkNoteBtn.click();
+    }
+
+    public void voidOrder() {
+        waitForVisibility(voidBtn);
+        voidBtn.click();
+        waitForVisibility(confirmVoidBtn);
+        confirmVoidBtn.click();
     }
 }
