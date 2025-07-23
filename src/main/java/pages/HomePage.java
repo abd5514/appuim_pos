@@ -220,12 +220,6 @@ public class HomePage {
         return new Random().nextInt(upperBound);
     }
 
-    public void selectMultipleTimes(int count) throws InterruptedException {
-        for (int i = 0; i < count; i++) {
-            Select();
-        }
-    }
-
     public void checkoutOrder() {
         waitForVisibility(checkoutBtn);
         checkoutBtn.click();
@@ -239,7 +233,7 @@ public class HomePage {
         waitForVisibility(parkBtn);
         parkBtn.click();
         waitForVisibility(parkNoteTxt);
-        parkNoteTxt.sendKeys(note);
+        parkNoteTxt.sendKeys(note + " " + new Random().nextInt(1000)); // Append a random number to the note
         waitForVisibility(parkNoteBtn);
         parkNoteBtn.click();
     }
