@@ -4,43 +4,44 @@ import base.BaseTest;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import pages.HomePage;
+import utils.ActionUtils;
 import utils.RetryAnalyzer;
 
 @Listeners(utils.TestListener.class)
 public class HomePageTest extends BaseTest {
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void checkoutOrder() throws InterruptedException {
+    public void checkoutOrder() throws Exception {
         HomePage homePage = new HomePage();
-        homePage.selectMultipleTimes(3);
+        ActionUtils.runMultipleTimes(3, homePage::Select);
         homePage.checkoutOrder();
     }
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void parkOrder() throws InterruptedException {
+    public void parkOrder() throws Exception {
         HomePage homePage = new HomePage();
-        homePage.selectMultipleTimes(3);
+        ActionUtils.runMultipleTimes(3, homePage::Select);
         homePage.parkOrder("Test note for parking order");
     }
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void voidOrder() throws InterruptedException {
+    public void voidOrder() throws Exception {
         HomePage homePage = new HomePage();
-        homePage.selectMultipleTimes(3);
+        ActionUtils.runMultipleTimes(3, homePage::Select);
         homePage.voidOrder();
     }
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void splitByValueOrder() throws InterruptedException {
+    public void splitByValueOrder() throws Exception {
         HomePage homePage = new HomePage();
-        homePage.selectMultipleTimes(3);
+        ActionUtils.runMultipleTimes(3, homePage::Select);
         homePage.splitByValue();
     }
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void splitByItemOrder() throws InterruptedException {
+    public void splitByItemOrder() throws Exception {
         HomePage homePage = new HomePage();
-        homePage.selectMultipleTimes(3);
+        ActionUtils.runMultipleTimes(3, homePage::Select);
         homePage.splitByItem();
     }
 }
