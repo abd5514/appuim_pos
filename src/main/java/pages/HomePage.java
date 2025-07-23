@@ -15,6 +15,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static utils.SharedMethods.getRandomIndex;
 import static utils.WaitUtils.*;
 
 
@@ -189,6 +190,16 @@ public class HomePage {
      * Entry point: select category and handle variants/modifiers.
      */
     public void Select() throws InterruptedException {
+        sideMenuHomePage.click();
+        try {
+            sideMenuHomePage.click();
+            if(!mainMenu.isDisplayed()) {
+                sideMenuHomePage.click();
+            }
+        } catch (Exception e) {
+            // If the main menu is not displayed, we assume we are already on the home page.
+            System.out.println("Main menu is not displayed, assuming we are on the home page.");
+        }
         getWait(1);
         getAllProducts();
         if (backBtn.isDisplayed()) getAllProducts();
@@ -216,10 +227,6 @@ public class HomePage {
         waitForVisibility(mainMenu);
     }
 
-    private int getRandomIndex(int upperBound) {
-        return new Random().nextInt(upperBound);
-    }
-
     public void checkoutOrder() {
         waitForVisibility(checkoutBtn);
         checkoutBtn.click();
@@ -233,7 +240,7 @@ public class HomePage {
         waitForVisibility(parkBtn);
         parkBtn.click();
         waitForVisibility(parkNoteTxt);
-        parkNoteTxt.sendKeys(note + " " + new Random().nextInt(1000)); // Append a random number to the note
+        parkNoteTxt.sendKeys(note + " " + getRandomIndex(1000)); // Append a random number to the note
         waitForVisibility(parkNoteBtn);
         parkNoteBtn.click();
     }
