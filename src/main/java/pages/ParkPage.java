@@ -60,7 +60,7 @@ public class ParkPage {
         }
     }
 
-    public void restoreParkedOrder() {
+    public void restoreOrVoidParkedOrder(boolean shouldVoid) {
         parkBtn.click();
         waitForVisibility(parkOrderContainer);
         List<WebElement> parkedOrders = getAllParkedOrders();
@@ -70,10 +70,10 @@ public class ParkPage {
             return;
         }
         Set<Integer> triedIndices = new HashSet<>();
-        restoreParkedOrderRecursive(parkedOrders, triedIndices);
+        restoreOrVoidParkedOrderRecursive(parkedOrders, triedIndices, shouldVoid);
     }
 
-    private void restoreParkedOrderRecursive(List<WebElement> parkedOrders, Set<Integer> triedIndices) {
+    private void restoreOrVoidParkedOrderRecursive(List<WebElement> parkedOrders, Set<Integer> triedIndices, boolean shouldVoid) {
         if (triedIndices.size() == parkedOrders.size()) {
             System.out.println("All parked orders are partially paid, cannot restore any.");
             return;
@@ -87,24 +87,26 @@ public class ParkPage {
         clickAnyParkedOrder(index);
         waitForVisibility(checkoutBtn);
         try {
-            if (!restoreBtn.isDisplayed()) {
-                System.out.println("Order at index " + index + " is partially paid, retrying...");
-                restoreParkedOrderRecursive(parkedOrders, triedIndices);
-            }else {
-                restoreBtn.click();
+            if( shouldVoid) {
+                if (!voidBtn.isDisplayed()) {
+                    System.out.println("Order at index " + index + " is partially paid, retrying...");
+                    restoreOrVoidParkedOrderRecursive(parkedOrders, triedIndices, shouldVoid);
+                }else {
+                    voidBtn.click();
+                    waitForVisibility(confirmVoidBtn);
+                    confirmVoidBtn.click();
+                }
+            } else {
+                if (!restoreBtn.isDisplayed()) {
+                    System.out.println("Order at index " + index + " is partially paid, retrying...");
+                    restoreOrVoidParkedOrderRecursive(parkedOrders, triedIndices, shouldVoid);
+                }else {
+                    restoreBtn.click();
+                }
             }
         } catch (Exception e) {
             System.out.println("Order at index " + index + " is partially paid, retrying...");
-            restoreParkedOrderRecursive(parkedOrders, triedIndices);
+            restoreOrVoidParkedOrderRecursive(parkedOrders, triedIndices, shouldVoid);
         }
-    }
-    public void voidParkedOrder() {
-        parkBtn.click();
-        waitForVisibility(parkOrderContainer);
-        clickAnyParkedOrder(getRandomIndex(getAllParkedOrders().size()));
-        waitForVisibility(voidBtn);
-        voidBtn.click();
-        waitForVisibility(confirmVoidBtn);
-        confirmVoidBtn.click();
     }
 }

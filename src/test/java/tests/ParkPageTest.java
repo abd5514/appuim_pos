@@ -15,6 +15,15 @@ public class ParkPageTest extends BaseTest {
         homePageTest.parkOrder();
         ParkPage parkPage = new ParkPage();
         parkPage.parkBtn.click();
-        parkPage.restoreParkedOrder();
+        parkPage.restoreOrVoidParkedOrder(false);
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void voidParkOrder() throws Exception {
+        HomePageTest homePageTest = new HomePageTest();
+        homePageTest.parkOrder();
+        ParkPage parkPage = new ParkPage();
+        parkPage.parkBtn.click();
+        parkPage.restoreOrVoidParkedOrder(true);
     }
 }
