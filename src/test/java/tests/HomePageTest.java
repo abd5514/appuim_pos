@@ -36,4 +36,11 @@ public class HomePageTest extends BaseTest {
         homePage.selectMultipleTimes(3);
         homePage.splitByValue();
     }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void splitByItemOrder() throws InterruptedException {
+        HomePage homePage = new HomePage();
+        homePage.selectMultipleTimes(3);
+        homePage.splitByItem();
+    }
 }

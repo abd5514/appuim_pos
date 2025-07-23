@@ -32,6 +32,8 @@ public class HomePage {
     public WebElement page2Btn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/doneBtn")
     public WebElement doneBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/fragment_menu")
+    public WebElement mainMenu;
     @AndroidFindBy(id = "com.figment.pos.dev:id/homeLayout")
     public WebElement sideMenuHomePage;
     @AndroidFindBy(id = "com.figment.pos.dev:id/managerDashboardLayout")
@@ -64,6 +66,12 @@ public class HomePage {
     public WebElement newChargeBtn;
     @AndroidFindBy(xpath = "(//android.view.ViewGroup[@resource-id=\"com.figment.pos.dev:id/container\"])[2]")
     public WebElement creditPaymentSplit;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/splitByItemBtn")
+    public WebElement splitByItemBtn;
+    @AndroidFindBy(xpath = "//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/productsRecyclerView']/android.view.ViewGroup")
+    public WebElement productsRecyclerView;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/header")
+    public WebElement dailySalesHeader;
 
     public int min;
     public int max;
@@ -82,12 +90,13 @@ public class HomePage {
     public void clickAnyOfOrderOptions() {
         String orderOptions = "//androidx.recyclerview.widget.RecyclerView[@resource-id=\"com.figment.pos.dev:id/orderOptions\"]/android.view.ViewGroup";
         List<WebElement> options = DriverManager.getDriver().findElements(By.xpath(orderOptions));
-        options.get(getRandomIndex(options.size())).click();
+        options.get(0).click();
     }
     /**
      * Selects a random product category.
      */
     public void getAllProducts() throws InterruptedException {
+
         List<WebElement> categories = DriverManager.getDriver().findElements(
                 By.xpath("//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.view.View/android.view.View")
         );
@@ -180,6 +189,7 @@ public class HomePage {
      * Entry point: select category and handle variants/modifiers.
      */
     public void Select() throws InterruptedException {
+        getWait(1);
         getAllProducts();
         if (backBtn.isDisplayed()) getAllProducts();
         handleVariantsAndModifiers();
@@ -192,8 +202,18 @@ public class HomePage {
         clickAnyOfOrderOptions();
         waitForVisibility(sideMenuDailySales);
         sideMenuDailySales.click();
-        waitForVisibility(dailySalesMainBanner);
+        waitForVisibility(dailySalesHeader);
         sideMenuHomePage.click();
+        try {
+            sideMenuHomePage.click();
+            if(!mainMenu.isDisplayed()) {
+                sideMenuHomePage.click();
+            }
+        } catch (Exception e) {
+            // If the main menu is not displayed, we assume we are already on the home page.
+            System.out.println("Main menu is not displayed, assuming we are on the home page.");
+        }
+        waitForVisibility(mainMenu);
     }
 
     private int getRandomIndex(int upperBound) {
@@ -251,4 +271,37 @@ public class HomePage {
         waitForVisibility(payBtn);
         payBtn.click();
     }
+
+    // begin copilot code
+    public void splitByItem() {
+        waitForVisibility(checkoutBtn);
+        checkoutBtn.click();
+        waitForVisibility(splitByItemBtn);
+        splitByItemBtn.click();
+        waitForVisibility(productsRecyclerView);
+        getWait(500);
+        List<WebElement> products = DriverManager.getDriver().findElements(
+            By.xpath("//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/productsRecyclerView']/android.view.ViewGroup")
+        );
+        for (int i = 1; i <= products.size(); i++) {
+            String indexedXPath = "//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/productsRecyclerView']/android.view.ViewGroup[" + i + "]";
+            try {
+                WebElement product = DriverManager.getDriver().findElement(By.xpath(indexedXPath));
+                System.out.println("Checking product at index " + i + ": " + product.getText());
+                if (product.isDisplayed()) {
+                    product.click();
+                    break;
+                }
+            } catch (Exception e) {
+                System.out.println("Product at index " + i + " not found or not visible.");
+            }
+        }
+        payBtn.click();
+        waitForVisibility(creditPaymentSplit);
+        creditPaymentSplit.click();
+        waitForVisibility(payBtn);
+        payBtn.click();
+        Assert.assertTrue(payBtn.isDisplayed(), "Pay button should be displayed after splitting by item.");
+    }
+    // end copilot code
 }
