@@ -280,7 +280,7 @@ public class HomePage {
         waitForVisibility(splitByItemBtn);
         splitByItemBtn.click();
         waitForVisibility(productsRecyclerView);
-        getWait(500);
+        getWait(2);
         List<WebElement> products = DriverManager.getDriver().findElements(
             By.xpath("//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/productsRecyclerView']/android.view.ViewGroup")
         );
