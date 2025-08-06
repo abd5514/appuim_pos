@@ -6,6 +6,8 @@ import org.testng.annotations.Test;
 import pages.StaffLoginPage;
 import utils.RetryAnalyzer;
 
+import static utils.SharedMethods.*;
+
 @Listeners(utils.TestListener.class)
 public class StaffLoginTest extends BaseTest {
 

@@ -4,6 +4,7 @@ import drivers.DriverManager;
 import org.testng.annotations.AfterMethod;
 import org.testng.annotations.BeforeMethod;
 import utils.ConfigReader;
+import utils.SharedMethods;
 
 public class BaseTest {
 
@@ -13,6 +14,7 @@ public class BaseTest {
         boolean fullReset = Boolean.parseBoolean(System.getProperty("fullReset", "false"));
         DriverManager.initDriver(noReset, fullReset);
         DriverManager.getDriver().activateApp(ConfigReader.get("appPackage"));
+        new SharedMethods().checkForSyncPopup();
     }
 
     @AfterMethod
