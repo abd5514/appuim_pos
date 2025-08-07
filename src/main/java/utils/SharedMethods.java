@@ -83,9 +83,14 @@ public class SharedMethods {
         payBtn.click();
     }
 
-    public void splitByValue() {
-        waitForVisibility(checkoutBtn);
-        checkoutBtn.click();
+    public void splitByValue(String page) {
+        if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
+            waitForVisibility(parkCheckoutBtn);
+            parkCheckoutBtn.click();
+        } else {
+            waitForVisibility(checkoutBtn);
+            checkoutBtn.click();
+        }
         waitForVisibility(splitByValueBtn);
         splitByValueBtn.click();
         waitForVisibility(chargeBtn);
@@ -104,9 +109,14 @@ public class SharedMethods {
         payBtn.click();
     }
 
-    public void splitByItem() {
-        waitForVisibility(checkoutBtn);
-        checkoutBtn.click();
+    public void splitByItem(String page) {
+        if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
+            waitForVisibility(parkCheckoutBtn);
+            parkCheckoutBtn.click();
+        } else {
+            waitForVisibility(checkoutBtn);
+            checkoutBtn.click();
+        }
         waitForVisibility(splitByItemBtn);
         splitByItemBtn.click();
         waitForVisibility(productsRecyclerView);

@@ -114,4 +114,14 @@ public class ParkPage {
     public void checkoutParkOrder(String page) {
         new SharedMethods().checkoutOrder(page);
     }
+
+    public void splitByItemParkOrder(String page) {
+        new SharedMethods().splitByItem(page);
+    }
+
+    public void splitByValueParkOrder(String page) {
+        waitForVisibility(parkBtn);
+        parkBtn.click();
+        new SharedMethods().splitByValue(page);
+    }
 }

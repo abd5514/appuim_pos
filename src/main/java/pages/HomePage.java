@@ -229,12 +229,12 @@ public class HomePage {
     }
 
     public void splitByValue() {
-        new SharedMethods().splitByValue();
+        new SharedMethods().splitByValue("home");
     }
 
     // begin copilot code
     public void splitByItem() {
-        new SharedMethods().splitByItem();
+        new SharedMethods().splitByItem("home");
     }
     // end copilot code
 }

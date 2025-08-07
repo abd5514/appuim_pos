@@ -7,6 +7,7 @@ import pages.ParkPage;
 import utils.RetryAnalyzer;
 import utils.SharedMethods;
 
+import static utils.WaitUtils.getWait;
 import static utils.WaitUtils.waitForVisibility;
 
 @Listeners(utils.TestListener.class)
@@ -38,5 +39,25 @@ public class ParkPageTest extends BaseTest {
         waitForVisibility(parkPage.parkBtn);
         parkPage.parkBtn.click();
         parkPage.checkoutParkOrder("Park");
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void SplitByItemParkOrder() throws Exception {
+        HomePageTest homePageTest = new HomePageTest();
+        homePageTest.parkOrder();
+        ParkPage parkPage = new ParkPage();
+        waitForVisibility(parkPage.parkBtn);
+        parkPage.parkBtn.click();parkPage.parkBtn.click();
+        parkPage.splitByItemParkOrder("Park");
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void SplitByValueParkOrder() throws Exception {
+        HomePageTest homePageTest = new HomePageTest();
+        homePageTest.parkOrder();
+        ParkPage parkPage = new ParkPage();
+        waitForVisibility(parkPage.parkBtn);
+        parkPage.parkBtn.click();parkPage.parkBtn.click();
+        parkPage.splitByValueParkOrder("Park");
     }
 }
