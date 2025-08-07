@@ -70,12 +70,12 @@ public class SharedMethods {
     }*/
 
     public void checkoutOrder(String page) {
-        if(page == null || page.isEmpty()) {
-            waitForVisibility(checkoutBtn);
-            checkoutBtn.click();
-        } else {
+        if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
             waitForVisibility(parkCheckoutBtn);
             parkCheckoutBtn.click();
+        } else {
+            waitForVisibility(checkoutBtn);
+            checkoutBtn.click();
         }
         waitForVisibility(creditPaymentContainer);
         creditPaymentContainer.click();

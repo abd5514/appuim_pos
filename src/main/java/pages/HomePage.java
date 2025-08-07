@@ -209,7 +209,7 @@ public class HomePage {
     }
 
     public void checkoutOrder() {
-        new SharedMethods().checkoutOrder(null);
+        new SharedMethods().checkoutOrder("home");
     }
 
     public void parkOrder(String note) {
