@@ -59,18 +59,24 @@ public class SharedMethods {
         }
     }
 
-    public void checkoutOrder() {
+    /*public void checkoutOrder() {
+
         waitForVisibility(checkoutBtn);
         checkoutBtn.click();
         waitForVisibility(creditPaymentContainer);
         creditPaymentContainer.click();
         waitForVisibility(payBtn);
         payBtn.click();
-    }
+    }*/
 
     public void checkoutOrder(String page) {
-        waitForVisibility(parkCheckoutBtn);
-        parkCheckoutBtn.click();
+        if(page == null || page.isEmpty()) {
+            waitForVisibility(checkoutBtn);
+            checkoutBtn.click();
+        } else {
+            waitForVisibility(parkCheckoutBtn);
+            parkCheckoutBtn.click();
+        }
         waitForVisibility(creditPaymentContainer);
         creditPaymentContainer.click();
         waitForVisibility(payBtn);
