@@ -38,6 +38,8 @@ public class SharedMethods {
     public WebElement productsRecyclerView;
     @AndroidFindBy(id = "com.figment.pos.dev:id/proceed")
     public WebElement checkoutBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/checkout")
+    public WebElement parkCheckoutBtn;
 
     public SharedMethods() {
         // Initialize page elements with AppiumFieldDecorator
@@ -60,6 +62,15 @@ public class SharedMethods {
     public void checkoutOrder() {
         waitForVisibility(checkoutBtn);
         checkoutBtn.click();
+        waitForVisibility(creditPaymentContainer);
+        creditPaymentContainer.click();
+        waitForVisibility(payBtn);
+        payBtn.click();
+    }
+
+    public void checkoutOrder(String page) {
+        waitForVisibility(parkCheckoutBtn);
+        parkCheckoutBtn.click();
         waitForVisibility(creditPaymentContainer);
         creditPaymentContainer.click();
         waitForVisibility(payBtn);

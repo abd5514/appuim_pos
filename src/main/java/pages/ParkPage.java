@@ -6,6 +6,7 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import utils.SharedMethods;
 
 
 import java.util.ArrayList;
@@ -108,5 +109,9 @@ public class ParkPage {
             System.out.println("Order at index " + index + " is partially paid, retrying...");
             restoreOrVoidParkedOrderRecursive(parkedOrders, triedIndices, shouldVoid);
         }
+    }
+
+    public void checkoutParkOrder(String page) {
+        new SharedMethods().checkoutOrder(page);
     }
 }
