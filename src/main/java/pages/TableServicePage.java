@@ -14,6 +14,7 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import static utils.SharedMethods.getRandomIndex;
@@ -52,14 +53,15 @@ public class TableServicePage {
     public WebElement orderBtn;
 
 
-    List<WebElement> reservedButtons = new ArrayList<>();
-    List<WebElement> freeButtons = new ArrayList<>();
-    List<WebElement> busyButtons = new ArrayList<>();
+
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
     }
 
     public List<WebElement> checkButtonsStatus(String tableStatus) {
+        List<WebElement> freeButtons = new ArrayList<>();
+        List<WebElement> reservedButtons = new ArrayList<>();
+        List<WebElement> busyButtons = new ArrayList<>();
         waitForVisibility(tableServiceSideBtn);
         tableServiceSideBtn.click();
         waitForVisibility(tableContainerCanvas);
@@ -82,7 +84,7 @@ public class TableServicePage {
                     reservedButtons.add(btn);
                 } else if (isFree) {
                     freeButtons.add(btn);
-                    System.out.println(freeButtons.size() + " free buttons found at index " + i);
+                    System.out.println(btn + "        " +freeButtons.size() + " free buttons found at index " + i + "         " );
                 } else {
                     System.out.println("⚠️ Could not determine status at index " + i + "\n");
                 }
