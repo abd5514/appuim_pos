@@ -4,11 +4,19 @@ import drivers.DriverManager;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.NoSuchElementException;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.time.Duration;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import static utils.SharedMethods.getRandomIndex;
 import static utils.WaitUtils.waitForVisibility;
 
 
@@ -22,52 +30,81 @@ public class TableServicePage {
     public WebElement tableServiceSideBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/canvasLayout")
     public WebElement tableContainerCanvas;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnReserve")
+    public WebElement reserveBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnVoid")
+    public WebElement voidBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnEdit")
+    public WebElement editBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnTransferItems")
+    public WebElement transferItemBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnTransferTable")
+    public WebElement transferTableBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnMergeTable")
+    public WebElement mergeBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnProceed")
+    public WebElement checkoutTableBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnCancel")
+    public WebElement cancelBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btn5")
+    public WebElement fiveBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnOrder")
+    public WebElement orderBtn;
 
+
+    List<WebElement> reservedButtons = new ArrayList<>();
+    List<WebElement> freeButtons = new ArrayList<>();
+    List<WebElement> busyButtons = new ArrayList<>();
     public List<WebElement> getButtonsInsideTableContainer() {
-        System.out.println("Buttons inside table container: " + tableContainerCanvas.findElements(By.className("android.widget.Button")).size());
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
     }
 
-    public void checkTablesByColor() {
+    public List<WebElement> checkButtonsStatus(String tableStatus) {
         waitForVisibility(tableServiceSideBtn);
         tableServiceSideBtn.click();
         waitForVisibility(tableContainerCanvas);
-
         List<WebElement> allButtons = getButtonsInsideTableContainer();
-        WebElement unknownColorButton = null;
 
-        for (WebElement button : allButtons) {
-            System.out.println("TEXT: " + button.getText());
-            System.out.println("CONTENT-DESC: " + button.getAttribute("content-desc"));
-            System.out.println("RESOURCE-ID: " + button.getAttribute("resource-id"));
-            System.out.println("CLASS: " + button.getAttribute("class"));
-//            System.out.println("DESCRIPTION: " + button.getAttribute("description")); // Some apps use this
-//            System.out.println("BACKGROUND: " + button.getAttribute("background"));
-        }
+        for (int i = 0; i < allButtons.size(); i++) {
+            allButtons = getButtonsInsideTableContainer();
+            if (i >= allButtons.size()) break;
+            WebElement btn = allButtons.get(i);
+            try {
+                btn.click();
+                boolean isBusy = false, isReserved = false, isFree = false;
+                try { isBusy = voidBtn.isDisplayed(); } catch (Exception ignored) {}
+                try { isReserved = cancelBtn.isDisplayed(); } catch (Exception ignored) {}
+                try { isFree = reserveBtn.isDisplayed(); } catch (Exception ignored) {}
 
-        for (WebElement button : allButtons) {
-            String desc = button.getAttribute("content-desc");
-//            System.out.println(button.getCssValue("background-color")); // This line is not necessary, but can be used to debug colors
-            if (desc == null) continue;
+                if (isBusy) {
+                    busyButtons.add(btn);
+                } else if (isReserved) {
+                    reservedButtons.add(btn);
+                } else if (isFree) {
+                    freeButtons.add(btn);
+                    System.out.println(freeButtons.size() + " free buttons found at index " + i);
+                } else {
+                    System.out.println("⚠️ Could not determine status at index " + i + "\n");
+                }
 
-            if (desc.contains("#09d0c5")) {
-                System.out.println("✅ Green Table: " + button.getText());
-            } else if (desc.contains("#b2b2b2")) {
-                System.out.println("🪑 Gray Table: " + button.getText());
-            } else if (desc.contains("#fa7f6f")) {
-                System.out.println("🟥 Red Table: " + button.getText());
-            } else if (desc.contains("#ffb42f")) {
-                System.out.println("🟨 Yellow Table: " + button.getText());
-            } else if (desc.contains("#042f6a")) {
-                System.out.println("🔵 Dark Blue Table: " + button.getText());
-            } else {
-                unknownColorButton = button; // Save for later
-                System.out.println("❓ Unknown color: " + desc + " for Table: " + button.getText());
+            } catch (Exception e) {
+                System.out.println("⚠️ Click/status failed at index " + i + ": " + e.getMessage() + "\n");
             }
         }
-
-        if (unknownColorButton != null) {
-            unknownColorButton.click(); // Click AFTER loop is finished
+        if ("free".equalsIgnoreCase(tableStatus)) {
+            System.out.println("Returning free buttons: " + freeButtons.size());
+            return freeButtons;
+        } else if ("busy".equalsIgnoreCase(tableStatus)) {
+            return busyButtons;
+        } else if ("reserved".equalsIgnoreCase(tableStatus)) {
+            return reservedButtons;
         }
+        return new ArrayList<>(); // Return empty list if no valid status is provided
+    }
+
+    public void reserveTable() {
+        List<WebElement> free = checkButtonsStatus("free");
+        free.get(0).click();
+        System.out.println("Reserving table...");
     }
 }

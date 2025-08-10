@@ -4,7 +4,6 @@ import base.BaseTest;
 import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import pages.TableServicePage;
-import utils.ActionUtils;
 import utils.RetryAnalyzer;
 
 @Listeners(utils.TestListener.class)
@@ -13,6 +12,7 @@ public class TableServicePageTest extends BaseTest {
     @Test(retryAnalyzer = RetryAnalyzer.class)
     public void checkTables() throws Exception {
         TableServicePage tableServicePage = new TableServicePage();
-        tableServicePage.checkTablesByColor();
+//        tableServicePage.checkButtonsStatus();
+        tableServicePage.reserveTable();
     }
 }
