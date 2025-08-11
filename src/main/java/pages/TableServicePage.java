@@ -54,6 +54,14 @@ public class TableServicePage {
     public WebElement doneBtn;
     @AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Page 1\"]")
     public WebElement page1Btn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/btnSplitTable")
+    public WebElement splitTableBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/okBtn")
+    public WebElement confirmVoidBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/to")
+    public WebElement transferToDDL;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/transfer")
+    public WebElement transferBtn;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
@@ -90,6 +98,10 @@ public class TableServicePage {
                             } catch (NoSuchElementException e) {
                                 System.out.println("⚠️ Done button not found, cannot proceed with edit.");
                             }
+                        }
+                    } else if("void order".equalsIgnoreCase(actionType)){
+                        if(voidBtn.isEnabled()){
+                            voidOrderTable();
                         }
                     }
                 } else if (isReserved) {
@@ -156,4 +168,20 @@ public class TableServicePage {
         checkoutTableBtn.click();
         new SharedMethods().splitByValue("table service");
     }
+
+    public void voidOrderTable(){
+        waitForVisibility(voidBtn);
+        voidBtn.click();
+        waitForVisibility(confirmVoidBtn);
+        confirmVoidBtn.click();
+    }
+
+    public void transferItemTable(){
+        waitForVisibility(transferItemBtn);
+        transferItemBtn.click();
+        waitForVisibility(transferToDDL);
+        transferToDDL.click();
+    }
+
+
 }

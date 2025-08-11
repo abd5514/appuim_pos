@@ -34,4 +34,16 @@ public class TableServicePageTest extends BaseTest {
         tableServicePage.checkTableStatusAndMakeAction("new order");
         tableServicePage.splitByValueOrderTable();
     }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void VoidOrderTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("void order");
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void TransferItemsOrderTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("void order");
+    }
 }
