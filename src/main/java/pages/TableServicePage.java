@@ -5,16 +5,14 @@ import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import utils.ActionUtils;
+import utils.SharedMethods;
 
-import java.time.Duration;
 import java.util.*;
 
-import static utils.SharedMethods.getRandomIndex;
+import static utils.WaitUtils.getWait;
 import static utils.WaitUtils.waitForVisibility;
 
 
@@ -49,7 +47,13 @@ public class TableServicePage {
     @AndroidFindBy(id = "com.figment.pos.dev:id/btnOrder")
     public WebElement orderBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/proceed")
+    public WebElement doneEditBtn;
+    @AndroidFindBy(xpath = "//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[2]/android.widget.Button")
+    public WebElement backBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/doneBtn")
     public WebElement doneBtn;
+    @AndroidFindBy(xpath = "//android.widget.TextView[@text=\"Page 1\"]")
+    public WebElement page1Btn;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
@@ -79,7 +83,7 @@ public class TableServicePage {
                         if(editBtn.isEnabled()){
                             editBtn.click();
                             try {
-                                if(doneBtn.isDisplayed()){
+                                if(doneEditBtn.isDisplayed()){
                                     editTable();
                                     break;
                                 }
@@ -93,7 +97,7 @@ public class TableServicePage {
                 } else if (isFree) {
                     freeButtons.add(btn);
                     if ("new order".equalsIgnoreCase(actionType)){
-                        reserveTable();
+                        reserveTableAndMakeNewOrder();
                         break;
                     }
                 } else {
@@ -106,14 +110,50 @@ public class TableServicePage {
         if ("reserved".equalsIgnoreCase(actionType)) {}
     }
 
-    public void reserveTable() {
+    public void reserveTableAndMakeNewOrder() throws Exception {
         waitForVisibility(reserveBtn);
         reserveBtn.click();
+        waitForVisibility(fiveBtn);
+        fiveBtn.click();
+        waitForVisibility(orderBtn);
+        orderBtn.click();
+        ActionUtils.runMultipleTimes(3, this::tableServiceSelectMenu);
+        doneEditBtn.click();
         System.out.println("Reserving first free table found");
     }
 
-    public void editTable() {
+    public void editTable() throws Exception {
+        ActionUtils.runMultipleTimes(3, this::tableServiceSelectMenu);
+        doneEditBtn.click();
+    }
 
-        System.out.println("Editing table");
+    public void tableServiceSelectMenu() throws InterruptedException {
+        getWait(1);
+        new SharedMethods().getAllProducts();
+        if (backBtn.isDisplayed()) new SharedMethods().getAllProducts();
+        new SharedMethods().handleVariantsAndModifiers();
+        try {
+            doneBtn.click();
+        } catch (Exception ignored) {}
+
+        try {
+            backBtn.click();
+            Thread.sleep(300);
+            if(page1Btn.isDisplayed()) backBtn.click();
+        }catch (Exception e) {
+            System.out.println("backBtn not found, continuing without going back.");
+        }
+    }
+
+    public void checkoutOrderTable(){
+        waitForVisibility(checkoutTableBtn);
+        checkoutTableBtn.click();
+        new SharedMethods().checkoutOrder("table service");
+    }
+
+    public void splitByValueOrderTable(){
+        waitForVisibility(checkoutTableBtn);
+        checkoutTableBtn.click();
+        new SharedMethods().splitByValue("table service");
     }
 }

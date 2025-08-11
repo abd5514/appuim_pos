@@ -10,8 +10,28 @@ import utils.RetryAnalyzer;
 public class TableServicePageTest extends BaseTest {
 
     @Test(retryAnalyzer = RetryAnalyzer.class)
-    public void checkTables() throws Exception {
+    public void EditOrderTable() throws Exception {
         TableServicePage tableServicePage = new TableServicePage();
         tableServicePage.checkTableStatusAndMakeAction("edit order");
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void NewOrderTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("new order");
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void CheckoutOrderTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("new order");
+        tableServicePage.checkoutOrderTable();
+    }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void SplitByValueOrderTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("new order");
+        tableServicePage.splitByValueOrderTable();
     }
 }

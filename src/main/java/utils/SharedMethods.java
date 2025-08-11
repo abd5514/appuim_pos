@@ -43,6 +43,13 @@ public class SharedMethods {
     public WebElement checkoutBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/checkout")
     public WebElement parkCheckoutBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/doneBtn")
+    public WebElement doneBtn;
+
+    public int min;
+    public int max;
+    public int before;
+    public int after;
 
     public SharedMethods() {
         // Initialize page elements with AppiumFieldDecorator
@@ -66,7 +73,7 @@ public class SharedMethods {
         if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
             waitForVisibility(parkCheckoutBtn);
             parkCheckoutBtn.click();
-        } else {
+        } else if (page.equalsIgnoreCase("home")){
             waitForVisibility(checkoutBtn);
             checkoutBtn.click();
         }
@@ -80,7 +87,7 @@ public class SharedMethods {
         if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
             waitForVisibility(parkCheckoutBtn);
             parkCheckoutBtn.click();
-        } else {
+        } else if(page.equalsIgnoreCase("home")){
             waitForVisibility(checkoutBtn);
             checkoutBtn.click();
         }
@@ -106,7 +113,7 @@ public class SharedMethods {
         if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
             waitForVisibility(parkCheckoutBtn);
             parkCheckoutBtn.click();
-        } else {
+        } else if(page.equalsIgnoreCase("home")){
             waitForVisibility(checkoutBtn);
             checkoutBtn.click();
         }
@@ -151,5 +158,83 @@ public class SharedMethods {
             chosen.click();
             Thread.sleep(500);
         }
+    }
+
+    public void handleVariantsAndModifiers() throws InterruptedException {
+        String itemXPath   = "//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/recyclerView']/android.view.ViewGroup";
+        String buttonXPath = "//android.view.ViewGroup[@resource-id='com.figment.pos.dev:id/constraintLayout']";
+
+        List<WebElement> items = DriverManager.getDriver().findElements(By.xpath(itemXPath));
+        int markerItemIndex = -1;
+        min = 0;
+        max = 0;
+
+        for (int i = 0; i < items.size(); i++) {
+            WebElement item = items.get(i);
+            for (WebElement tv : item.findElements(By.className("android.widget.TextView"))) {
+                String text = tv.getText();
+                if (text.contains("Min:") && text.contains("Max:")) {
+                    Matcher m = Pattern.compile("Min:\\s*(\\d+)\\s*\\|\\s*Max:\\s*(\\d+)").matcher(text);
+                    if (m.find()) {
+                        min = Integer.parseInt(m.group(1));
+                        max = Integer.parseInt(m.group(2));
+                        markerItemIndex = i;
+                        break;
+                    }
+                }
+            }
+            if (markerItemIndex >= 0) break;
+        }
+
+        List<WebElement> allButtons = DriverManager.getDriver().findElements(By.xpath(buttonXPath));
+        int variantCount = markerItemIndex;
+
+        // Handle variants if present
+        if (variantCount > 0 && allButtons.size() >= variantCount) {
+            int randomIdx = getRandomIndex(variantCount);
+            allButtons.get(randomIdx).click();
+            Thread.sleep(300);
+        } else {
+            System.out.println("No variants found for this product.");
+        }
+
+        // Handle modifiers if present
+        if (min > 0 && allButtons.size() >= (variantCount + min)) {
+            for (int offset = 0; offset < min; offset++) {
+                int globalIdx = variantCount + offset;
+                int tries = 0;
+                boolean clicked = false;
+                while (!clicked && tries < 6) {
+                    List<WebElement> buttons = DriverManager.getDriver().findElements(By.xpath(buttonXPath));
+                    if (buttons.size() > globalIdx) {
+                        try {
+                            buttons.get(globalIdx).click();
+                            Thread.sleep(300);
+                            clicked = true;
+                        } catch (StaleElementReferenceException stale) {
+                            System.out.println("Stale, retry modifier #" + (offset + 1));
+                        }
+                    } else {
+                        ScrollUtils.scrollDown(DriverManager.getDriver());
+                        Thread.sleep(300);
+                        tries++;
+                        System.out.println("Scrolling for modifier #" + (offset + 1));
+                    }
+                }
+                if (!clicked) {
+                    System.out.println("Failed modifier #" + (offset + 1));
+                    break;
+                }
+            }
+            doneBtn.click();
+        } else {
+            System.out.println("No modifiers required for this product.");
+        }
+    }
+
+    public int getCartItemsCount() {
+        String cartItem = "//androidx.recyclerview.widget.RecyclerView[@resource-id=\"com.figment.pos.dev:id/cartItems\"]/android.view.ViewGroup";
+        List<WebElement> items = DriverManager.getDriver().findElements(By.xpath(cartItem));
+        return items.size();
     }
 }
