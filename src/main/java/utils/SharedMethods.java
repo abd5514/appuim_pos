@@ -4,6 +4,7 @@ import drivers.DriverManager;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.By;
+import org.openqa.selenium.StaleElementReferenceException;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
@@ -12,6 +13,8 @@ import static utils.WaitUtils.*;
 
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class SharedMethods {
     @AndroidFindBy(id = "com.figment.pos.dev:id/okBtn")
@@ -58,16 +61,6 @@ public class SharedMethods {
             System.out.println("Sync popup not appeared, continuing without action.");
         }
     }
-
-    /*public void checkoutOrder() {
-
-        waitForVisibility(checkoutBtn);
-        checkoutBtn.click();
-        waitForVisibility(creditPaymentContainer);
-        creditPaymentContainer.click();
-        waitForVisibility(payBtn);
-        payBtn.click();
-    }*/
 
     public void checkoutOrder(String page) {
         if(page == null || page.isEmpty() || page.equalsIgnoreCase("park")) {
@@ -143,5 +136,20 @@ public class SharedMethods {
         waitForVisibility(payBtn);
         payBtn.click();
         Assert.assertTrue(payBtn.isDisplayed(), "Pay button should be displayed after splitting by item.");
+    }
+
+    public void getAllProducts() throws InterruptedException {
+        List<WebElement> categories = DriverManager.getDriver().findElements(
+                By.xpath("//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.view.View/android.view.View")
+        );
+        if (categories.isEmpty()) {
+            System.out.println("No categories found.");
+            return;
+        }
+        WebElement chosen = categories.get(getRandomIndex(categories.size()));
+        if (chosen.isDisplayed()) {
+            chosen.click();
+            Thread.sleep(500);
+        }
     }
 }

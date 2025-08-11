@@ -78,19 +78,7 @@ public class HomePage {
      * Selects a random product category.
      */
     public void getAllProducts() throws InterruptedException {
-
-        List<WebElement> categories = DriverManager.getDriver().findElements(
-                By.xpath("//androidx.compose.ui.platform.ComposeView/android.view.View/android.view.View/android.view.View/android.view.View[1]/android.view.View/android.view.View")
-        );
-        if (categories.isEmpty()) {
-            System.out.println("No categories found.");
-            return;
-        }
-        WebElement chosen = categories.get(getRandomIndex(categories.size()));
-        if (chosen.isDisplayed()) {
-            chosen.click();
-            Thread.sleep(500);
-        }
+        new SharedMethods().getAllProducts();
     }
 
     /*new copilot code section start*/

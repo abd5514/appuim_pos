@@ -12,7 +12,6 @@ public class TableServicePageTest extends BaseTest {
     @Test(retryAnalyzer = RetryAnalyzer.class)
     public void checkTables() throws Exception {
         TableServicePage tableServicePage = new TableServicePage();
-//        tableServicePage.checkButtonsStatus();
-        tableServicePage.reserveTable();
+        tableServicePage.checkTableStatusAndMakeAction("edit order");
     }
 }

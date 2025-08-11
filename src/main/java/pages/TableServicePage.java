@@ -12,10 +12,7 @@ import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import static utils.SharedMethods.getRandomIndex;
 import static utils.WaitUtils.waitForVisibility;
@@ -51,24 +48,23 @@ public class TableServicePage {
     public WebElement fiveBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/btnOrder")
     public WebElement orderBtn;
-
-
+    @AndroidFindBy(id = "com.figment.pos.dev:id/proceed")
+    public WebElement doneBtn;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
     }
 
-    public List<WebElement> checkButtonsStatus(String tableStatus) {
+    public void checkTableStatusAndMakeAction(String actionType) {
         List<WebElement> freeButtons = new ArrayList<>();
         List<WebElement> reservedButtons = new ArrayList<>();
         List<WebElement> busyButtons = new ArrayList<>();
         waitForVisibility(tableServiceSideBtn);
         tableServiceSideBtn.click();
         waitForVisibility(tableContainerCanvas);
-        List<WebElement> allButtons = getButtonsInsideTableContainer();
-
-        for (int i = 0; i < allButtons.size(); i++) {
-            allButtons = getButtonsInsideTableContainer();
+        int count = getButtonsInsideTableContainer().size();
+        for (int i = 0; i < count; i++) {
+            List<WebElement> allButtons = getButtonsInsideTableContainer();
             if (i >= allButtons.size()) break;
             WebElement btn = allButtons.get(i);
             try {
@@ -77,36 +73,47 @@ public class TableServicePage {
                 try { isBusy = voidBtn.isDisplayed(); } catch (Exception ignored) {}
                 try { isReserved = cancelBtn.isDisplayed(); } catch (Exception ignored) {}
                 try { isFree = reserveBtn.isDisplayed(); } catch (Exception ignored) {}
-
                 if (isBusy) {
                     busyButtons.add(btn);
+                    if ("edit order".equalsIgnoreCase(actionType)){
+                        if(editBtn.isEnabled()){
+                            editBtn.click();
+                            try {
+                                if(doneBtn.isDisplayed()){
+                                    editTable();
+                                    break;
+                                }
+                            } catch (NoSuchElementException e) {
+                                System.out.println("⚠️ Done button not found, cannot proceed with edit.");
+                            }
+                        }
+                    }
                 } else if (isReserved) {
                     reservedButtons.add(btn);
                 } else if (isFree) {
                     freeButtons.add(btn);
-                    System.out.println(btn + "        " +freeButtons.size() + " free buttons found at index " + i + "         " );
+                    if ("new order".equalsIgnoreCase(actionType)){
+                        reserveTable();
+                        break;
+                    }
                 } else {
                     System.out.println("⚠️ Could not determine status at index " + i + "\n");
                 }
-
             } catch (Exception e) {
                 System.out.println("⚠️ Click/status failed at index " + i + ": " + e.getMessage() + "\n");
             }
         }
-        if ("free".equalsIgnoreCase(tableStatus)) {
-            System.out.println("Returning free buttons: " + freeButtons.size());
-            return freeButtons;
-        } else if ("busy".equalsIgnoreCase(tableStatus)) {
-            return busyButtons;
-        } else if ("reserved".equalsIgnoreCase(tableStatus)) {
-            return reservedButtons;
-        }
-        return new ArrayList<>(); // Return empty list if no valid status is provided
+        if ("reserved".equalsIgnoreCase(actionType)) {}
     }
 
     public void reserveTable() {
-        List<WebElement> free = checkButtonsStatus("free");
-        free.get(0).click();
-        System.out.println("Reserving table...");
+        waitForVisibility(reserveBtn);
+        reserveBtn.click();
+        System.out.println("Reserving first free table found");
+    }
+
+    public void editTable() {
+
+        System.out.println("Editing table");
     }
 }
