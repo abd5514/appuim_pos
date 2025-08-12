@@ -46,4 +46,10 @@ public class TableServicePageTest extends BaseTest {
         TableServicePage tableServicePage = new TableServicePage();
         tableServicePage.checkTableStatusAndMakeAction("transfer item");
     }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void TransferTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("transfer table");
+    }
 }

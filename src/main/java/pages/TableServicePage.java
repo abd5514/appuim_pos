@@ -66,6 +66,8 @@ public class TableServicePage {
     public WebElement transferBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/fromRecyclerView")
     public WebElement transferProductsContainer;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/cancel")
+    public WebElement cancelTransferBtn;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
@@ -111,8 +113,16 @@ public class TableServicePage {
                         }
                     }
                     else if("transfer item".equalsIgnoreCase(actionType)){
-                        transferItemTable();
-                        break;
+                        if(voidBtn.isEnabled()){
+                            transferItemTable();
+                            break;
+                        }
+                    }
+                    else if("transfer table".equalsIgnoreCase(actionType)){
+                        if(voidBtn.isEnabled()){
+                            transferTable();
+                            break;
+                        }
                     }
                 }
                 else if (isReserved) {
@@ -193,7 +203,7 @@ public class TableServicePage {
         waitForVisibility(transferToDDL);
         transferToDDL.click();
         getAllTransferToTables();
-        transferItemBtn.click();
+        transferBtn.click();
     }
 
     public void getAllTransferToTables() {
@@ -214,8 +224,6 @@ public class TableServicePage {
             try {
                 WebElement table = tables.get(i);
                 table.click();
-                System.out.println("✅ Clicked table " + i);
-
                 // Wait briefly for products to load
                 Thread.sleep(500);
 
@@ -227,18 +235,54 @@ public class TableServicePage {
                     transferToDDL.click();
                     System.out.println("ℹ️ No products found, opened dropdown.");
                 } else {
-                    System.out.println("📦 Products found: " + products.size());
-                    int halfSize = products.size() / 2;
-                    for (int j = 0; j < halfSize; j++) {
-                        try {
-                            products.get(j).click();
-                        } catch (Exception e) {
-                            System.out.println("⚠️ Could not click on product index " + j + ": " + e.getMessage());
+                    if( products.size() == 1) {
+                        System.out.println("📦 Products found: " + products.size() + "go to transfer table case");
+                        cancelTransferBtn.click();
+                        break;
+                    }else {
+                        int halfSize = products.size() / 2;
+                        for (int j = 0; j < halfSize; j++) {
+                            try {
+                                products.get(j).click();
+                            } catch (Exception e) {
+                                System.out.println("⚠️ Could not click on product index " + j + ": " + e.getMessage());
+                            }
                         }
-                    }
-                    break; // stop after handling one table with products
+                        break;
+                    }// stop after handling one table with products
                 }
                 Thread.sleep(500);
+            } catch (Exception e) {
+                System.out.println("⚠️ Error at table index " + i + ": " + e.getMessage());
+            }
+        }
+    }
+
+    public void transferTable(){
+        waitForVisibility(transferTableBtn);
+        transferTableBtn.click();
+        waitForVisibility(transferToDDL);
+        transferToDDL.click();
+        getAllTransferTables();
+        waitForVisibility(transferBtn);
+        transferBtn.click();
+    }
+
+    public void getAllTransferTables() {
+        for (int i = 1; ; i++) {
+            List<WebElement> tables = DriverManager.getDriver().findElements(
+                    By.xpath("//android.widget.ListView/android.view.ViewGroup")
+            );
+            if (tables.isEmpty()) {
+                System.out.println("⚠️ No transfer tables found at iteration " + i);
+                break; // stop if no tables
+            }
+            if (i >= tables.size()) {
+                break; // stop if index exceeds table count
+            }
+            try {
+                WebElement table = tables.get(i);
+                table.click();
             } catch (Exception e) {
                 System.out.println("⚠️ Error at table index " + i + ": " + e.getMessage());
             }
