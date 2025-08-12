@@ -52,4 +52,10 @@ public class TableServicePageTest extends BaseTest {
         TableServicePage tableServicePage = new TableServicePage();
         tableServicePage.checkTableStatusAndMakeAction("transfer table");
     }
+
+    @Test(retryAnalyzer = RetryAnalyzer.class)
+    public void MergeTable() throws Exception {
+        TableServicePage tableServicePage = new TableServicePage();
+        tableServicePage.checkTableStatusAndMakeAction("merge table");
+    }
 }

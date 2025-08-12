@@ -6,12 +6,9 @@ import io.appium.java_client.pagefactory.AppiumFieldDecorator;
 import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ActionUtils;
 import utils.SharedMethods;
 
-import java.time.Duration;
 import java.util.*;
 
 import static utils.WaitUtils.getWait;
@@ -59,7 +56,7 @@ public class TableServicePage {
     @AndroidFindBy(id = "com.figment.pos.dev:id/btnSplitTable")
     public WebElement splitTableBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/okBtn")
-    public WebElement confirmVoidBtn;
+    public WebElement confirmPopupBtn;
     @AndroidFindBy(id = "com.figment.pos.dev:id/to")
     public WebElement transferToDDL;
     @AndroidFindBy(id = "com.figment.pos.dev:id/transfer")
@@ -68,6 +65,8 @@ public class TableServicePage {
     public WebElement transferProductsContainer;
     @AndroidFindBy(id = "com.figment.pos.dev:id/cancel")
     public WebElement cancelTransferBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/merge")
+    public WebElement mergePopupBtn;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
@@ -121,6 +120,12 @@ public class TableServicePage {
                     else if("transfer table".equalsIgnoreCase(actionType)){
                         if(voidBtn.isEnabled()){
                             transferTable();
+                            break;
+                        }
+                    }
+                    else if("merge table".equalsIgnoreCase(actionType)){
+                        if(voidBtn.isEnabled()){
+                            mergeTables();
                             break;
                         }
                     }
@@ -193,8 +198,8 @@ public class TableServicePage {
     public void voidOrderTable(){
         waitForVisibility(voidBtn);
         voidBtn.click();
-        waitForVisibility(confirmVoidBtn);
-        confirmVoidBtn.click();
+        waitForVisibility(confirmPopupBtn);
+        confirmPopupBtn.click();
     }
 
     public void transferItemTable(){
@@ -263,12 +268,12 @@ public class TableServicePage {
         transferTableBtn.click();
         waitForVisibility(transferToDDL);
         transferToDDL.click();
-        getAllTransferTables();
+        getAllPopupTables();
         waitForVisibility(transferBtn);
         transferBtn.click();
     }
 
-    public void getAllTransferTables() {
+    public void getAllPopupTables() {
         for (int i = 1; ; i++) {
             List<WebElement> tables = DriverManager.getDriver().findElements(
                     By.xpath("//android.widget.ListView/android.view.ViewGroup")
@@ -289,6 +294,17 @@ public class TableServicePage {
         }
     }
 
-
+    public void mergeTables() {
+        waitForVisibility(mergeBtn);
+        mergeBtn.click();
+        waitForVisibility(transferToDDL);
+        transferToDDL.click();
+        getAllPopupTables();
+        waitForVisibility(mergePopupBtn);
+        mergePopupBtn.click();
+        mergePopupBtn.click();
+        waitForVisibility(confirmPopupBtn);
+        confirmPopupBtn.click();
+    }
 
 }
