@@ -19,6 +19,7 @@ public class DriverManager {
         String appActivity = ConfigReader.get("appActivity");
 //        String appPath = ConfigReader.get("appPath"); // optional
         boolean autoLaunch = Boolean.parseBoolean(ConfigReader.get("autoLaunch"));
+        boolean enableMultiWindows = Boolean.parseBoolean(ConfigReader.get("enableMultiWindows"));
 
         UiAutomator2Options options = new UiAutomator2Options();
         options.setPlatformName("Android");
@@ -28,9 +29,11 @@ public class DriverManager {
         options.setAppActivity(appActivity);
         options.setAutomationName("UiAutomator2");
 
+
         options.setCapability("appium:autoLaunch", autoLaunch);
         options.setCapability("appium:noReset", noReset);
         options.setCapability("appium:fullReset", fullReset);
+        options.setCapability("appium:enableMultiWindows", enableMultiWindows);
 
         try {
             driver.set(new AndroidDriver(new URL(gridUrl), options));

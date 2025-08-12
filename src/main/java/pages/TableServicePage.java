@@ -3,13 +3,15 @@ package pages;
 import drivers.DriverManager;
 import io.appium.java_client.pagefactory.AndroidFindBy;
 import io.appium.java_client.pagefactory.AppiumFieldDecorator;
-import org.openqa.selenium.By;
+import org.openqa.selenium.*;
 import org.openqa.selenium.NoSuchElementException;
-import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.PageFactory;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import utils.ActionUtils;
 import utils.SharedMethods;
 
+import java.time.Duration;
 import java.util.*;
 
 import static utils.WaitUtils.getWait;
@@ -62,6 +64,8 @@ public class TableServicePage {
     public WebElement transferToDDL;
     @AndroidFindBy(id = "com.figment.pos.dev:id/transfer")
     public WebElement transferBtn;
+    @AndroidFindBy(id = "com.figment.pos.dev:id/fromRecyclerView")
+    public WebElement transferProductsContainer;
 
     public List<WebElement> getButtonsInsideTableContainer() {
         return tableContainerCanvas.findElements(By.className("android.widget.Button"));
@@ -99,27 +103,36 @@ public class TableServicePage {
                                 System.out.println("⚠️ Done button not found, cannot proceed with edit.");
                             }
                         }
-                    } else if("void order".equalsIgnoreCase(actionType)){
+                    }
+                    else if("void order".equalsIgnoreCase(actionType)){
                         if(voidBtn.isEnabled()){
                             voidOrderTable();
+                            break;
                         }
                     }
-                } else if (isReserved) {
+                    else if("transfer item".equalsIgnoreCase(actionType)){
+                        transferItemTable();
+                        break;
+                    }
+                }
+                else if (isReserved) {
                     reservedButtons.add(btn);
-                } else if (isFree) {
+                }
+                else if (isFree) {
                     freeButtons.add(btn);
                     if ("new order".equalsIgnoreCase(actionType)){
                         reserveTableAndMakeNewOrder();
                         break;
                     }
-                } else {
+                }
+                else {
                     System.out.println("⚠️ Could not determine status at index " + i + "\n");
                 }
             } catch (Exception e) {
                 System.out.println("⚠️ Click/status failed at index " + i + ": " + e.getMessage() + "\n");
             }
         }
-        if ("reserved".equalsIgnoreCase(actionType)) {}
+//        if ("reserved".equalsIgnoreCase(actionType)) {}
     }
 
     public void reserveTableAndMakeNewOrder() throws Exception {
@@ -131,7 +144,6 @@ public class TableServicePage {
         orderBtn.click();
         ActionUtils.runMultipleTimes(3, this::tableServiceSelectMenu);
         doneEditBtn.click();
-        System.out.println("Reserving first free table found");
     }
 
     public void editTable() throws Exception {
@@ -147,7 +159,6 @@ public class TableServicePage {
         try {
             doneBtn.click();
         } catch (Exception ignored) {}
-
         try {
             backBtn.click();
             Thread.sleep(300);
@@ -181,7 +192,59 @@ public class TableServicePage {
         transferItemBtn.click();
         waitForVisibility(transferToDDL);
         transferToDDL.click();
+        getAllTransferToTables();
+        transferItemBtn.click();
     }
+
+    public void getAllTransferToTables() {
+        for (int i = 0; ; i++) {
+            List<WebElement> tables = DriverManager.getDriver().findElements(
+                    By.xpath("//android.widget.ListView/android.view.ViewGroup")
+            );
+
+            if (tables.isEmpty()) {
+                System.out.println("⚠️ No transfer tables found at iteration " + i);
+                break; // stop if no tables
+            }
+
+            if (i >= tables.size()) {
+                break; // stop if index exceeds table count
+            }
+
+            try {
+                WebElement table = tables.get(i);
+                table.click();
+                System.out.println("✅ Clicked table " + i);
+
+                // Wait briefly for products to load
+                Thread.sleep(500);
+
+                List<WebElement> products = DriverManager.getDriver().findElements(
+                        By.xpath("//androidx.recyclerview.widget.RecyclerView[@resource-id='com.figment.pos.dev:id/fromRecyclerView']/android.view.ViewGroup")
+                );
+
+                if (products.isEmpty()) {
+                    transferToDDL.click();
+                    System.out.println("ℹ️ No products found, opened dropdown.");
+                } else {
+                    System.out.println("📦 Products found: " + products.size());
+                    int halfSize = products.size() / 2;
+                    for (int j = 0; j < halfSize; j++) {
+                        try {
+                            products.get(j).click();
+                        } catch (Exception e) {
+                            System.out.println("⚠️ Could not click on product index " + j + ": " + e.getMessage());
+                        }
+                    }
+                    break; // stop after handling one table with products
+                }
+                Thread.sleep(500);
+            } catch (Exception e) {
+                System.out.println("⚠️ Error at table index " + i + ": " + e.getMessage());
+            }
+        }
+    }
+
 
 
 }

@@ -44,6 +44,6 @@ public class TableServicePageTest extends BaseTest {
     @Test(retryAnalyzer = RetryAnalyzer.class)
     public void TransferItemsOrderTable() throws Exception {
         TableServicePage tableServicePage = new TableServicePage();
-        tableServicePage.checkTableStatusAndMakeAction("void order");
+        tableServicePage.checkTableStatusAndMakeAction("transfer item");
     }
 }
